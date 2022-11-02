@@ -22,8 +22,7 @@ class GspreadsheetFdw(ForeignDataWrapper):
         super(GspreadsheetFdw, self).__init__(fdw_options, fdw_columns)
         self.columns  = fdw_columns
         self.headrow  = int(fdw_options.get('headrow','1'))
-        scopes = ['https://spreadsheets.google.com/feeds']
-        credentials = ServiceAccountCredentials.from_json(fdw_options["serviceaccount"], scopes)
+        credentials = ServiceAccountCredentials.from_json(fdw_options["serviceaccount"])
         gc = gspread.authorize(credentials)
         self.wks = gc.open_by_key(fdw_options["gskey"]).sheet1
 
