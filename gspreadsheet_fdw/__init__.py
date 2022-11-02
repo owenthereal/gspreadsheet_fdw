@@ -3,6 +3,7 @@ from multicorn import ForeignDataWrapper
 from multicorn.utils import log_to_postgres, ERROR, WARNING, DEBUG
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
+import json
 
 class GspreadsheetFdw(ForeignDataWrapper):
     def __init__(self, fdw_options, fdw_columns):
@@ -22,7 +23,8 @@ class GspreadsheetFdw(ForeignDataWrapper):
         super(GspreadsheetFdw, self).__init__(fdw_options, fdw_columns)
         self.columns  = fdw_columns
         self.headrow  = int(fdw_options.get('headrow','1'))
-        credentials = ServiceAccountCredentials.from_json(fdw_options["serviceaccount"])
+        scopes = ['https://spreadsheets.google.com/feeds']
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(fdw_options["serviceaccount"]), scopes)
         gc = gspread.authorize(credentials)
         self.wks = gc.open_by_key(fdw_options["gskey"]).sheet1
 
